@@ -1,0 +1,9 @@
+ansible_port: 5985
+ansible_connection: winrm
+ansible_winrm_scheme: http
+ansible_winrm_server_cert_validation: ignore
+win_updates_category_names: ['CriticalUpdates','SecurityUpdates','UpdateRollups']
+win_updates_reboot: true
+name_kb: windows6.1-kb4019264-x64
+
+

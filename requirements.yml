@@ -1,0 +1,5 @@
+# win_updates
+- src: https://github.com/deekayen/ansible-role-win_updates
+  name: deekayen.win_updates
+
+

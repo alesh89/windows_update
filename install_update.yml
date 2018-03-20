@@ -1,0 +1,51 @@
+---
+#- hosts: windows
+#  gather_facts: false
+#  roles:
+#     - role: deekayen.win_updates
+#       win_updates_reboot: false
+#       win_updates_category_names:
+#         - "CriticalUpdates"
+#         - "SecurityUpdates"
+#         - "UpdateRollups"
+#         - "Updates"
+#         - "DefinitionUpdates"
+#  environment: '{{ environment_host | default({}) }}'
+- name: "Install Windows updates."
+  gather_facts: false
+  hosts: windows
+  tasks:
+    - name: "Install Windows updates."
+      win_updates:
+        category_names: "{{ win_updates_category_names }}"
+      register: win_updates_result
+      failed_when: win_updates_result.failed is defined and win_updates_result.failed and win_updates_reboot == False
+
+  # Attempting some error handling.
+- name: "Reboot Windows to re-try update installation."
+  hosts: windows
+  tasks:
+    - name: "Reboot Windows to re-try update installation."
+      win_reboot:
+        shutdown_timeout_sec: 3600
+        reboot_timeout_sec: 3600
+      when:  win_updates_result.reboot_required is defined and win_updates_result.reboot_required == True and win_updates_reboot
+
+    # Let it fail this time if reboot didn't work.
+- name: "Install Windows updates again."
+  hosts: windows
+  tasks:
+    - name: "Install Windows updates again."
+      win_updates:
+        category_names: "{{ win_updates_category_names }}"
+      register: win_updates_result
+      failed_when: win_updates_result.failed is defined and win_updates_result.failed and win_updates_reboot == False
+
+- name: "Reboot when updates installed."
+  hosts: windows
+  tasks:
+    - name: "Reboot when updates installed."
+      win_reboot:
+        shutdown_timeout_sec: 3600
+        reboot_timeout_sec: 3600
+      when: win_updates_result.reboot_required is defined and win_updates_result.reboot_required == True
